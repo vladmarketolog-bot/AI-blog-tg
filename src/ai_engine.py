@@ -3,7 +3,9 @@ import json
 import re
 from .config import WRITER_PROMPT, CRITIC_PROMPT, GEMINI_API_KEY
 
-MODEL_NAMES = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash", "gemini-flash-latest"]
+MODEL_NAMES = ["gemini-3-flash-preview", "gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash"]
+
+import time
 
 def call_gemini_api(model_name, prompt):
     """
@@ -19,6 +21,14 @@ def call_gemini_api(model_name, prompt):
     
     try:
         response = requests.post(url, headers=headers, json=data)
+        
+        # Handle Rate Limiting (429)
+        if response.status_code == 429:
+            print(f"Rate limit hit for {model_name}. Waiting 60 seconds...")
+            time.sleep(60)
+            # Retry once
+            response = requests.post(url, headers=headers, json=data)
+            
         response.raise_for_status()
         result = response.json()
         
@@ -32,8 +42,11 @@ def call_gemini_api(model_name, prompt):
             
     except Exception as e:
         print(f"Error calling {model_name}: {e}")
-        if response.status_code != 200:
-             print(f"Response: {response.text}")
+        try:
+             if response.status_code != 200:
+                 print(f"Response: {response.text}")
+        except:
+            pass
         return None
 
 def generate_post(article_text):
