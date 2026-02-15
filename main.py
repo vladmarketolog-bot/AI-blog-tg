@@ -15,16 +15,32 @@ def main():
     # 2. Filter & Process
     processed_count = 0
     
+    # Limit the number of articles to process per run to avoid hitting API limits
+    # Gemini Free Tier has limits (e.g. 15 RPM). 
+    # Processing 5 articles = 5 * 2 (Generation + Critique) = 10 calls.
+    MAX_ARTICLES_TO_PROCESS = 5
+    articles_checked = 0
+    
+    import time
+    
     for article in articles:
+        if articles_checked >= MAX_ARTICLES_TO_PROCESS:
+            print(f"Reached limit of {MAX_ARTICLES_TO_PROCESS} processed articles. Stopping for this run.")
+            break
+            
         if is_url_processed(article['link']):
-            print(f"Skipping duplicate: {article['title']}")
+            # Skipping doesn't count towards API usage
             continue
             
         print(f"Processing: {article['title']}")
+        articles_checked += 1
         
         # 3. Generate Draft
         # Combine title and summary for better context
         content = f"Title: {article['title']}\nSource: {article['source']}\nSummary: {article['summary']}"
+        
+        # Add delay to respect rate limits (approx 4 seconds between calls to stay under 15 RPM)
+        time.sleep(5) 
         draft_post = generate_post(content)
         
         if not draft_post:
@@ -34,32 +50,17 @@ def main():
         print("Draft generated.")
         
         # 4. Critique
+        time.sleep(5) # Delay before critique
         score = critique_post(draft_post)
         print(f"Critique Score: {score}/10")
         
         if score < 8:
             print("Score too low. Skipping.")
-            # Optional: Log this? For now just skip.
-            # We mark as processed to avoid re-evaluating the same bad article forever?
-            # actually, if we mark it processed, we never retry. 
-            # If the score is low because of the article quality, that's good.
-            # If it's low because of Gemini mood, maybe bad.
-            # Let's mark it processed to avoid loops.
             add_url_to_history(article['link']) 
             continue
             
         # 5. Generate Image
-        # Extract tools/keywords for the image from the post? 
-        # The prompt asks for "Stack" in the text. We might need to extract it or just use the title.
-        # Let's use the Title and a generic "No-code" or extract from text if possible.
-        # For simplicity, let's use the article title and "AI & No-code" as subtitle/tools.
-        # Or better, ask Gemini to extract keywords? 
-        # The prompt says: "Developer must implement... function that takes template... adds Title... List of tools".
-        # I'll stick to Title and "No-code Tools" for now to keep it simple, or try to parse the draft.
-        
-        tools = "No-code / AI" # Placeholder, or could parse the "Стек:" line from draft
-        
-        # Try to parse stack from draft
+        tools = "No-code / AI" 
         import re
         stack_match = re.search(r'\*\*Стек\*\*:\s*(.*)', draft_post)
         if stack_match:
@@ -72,12 +73,10 @@ def main():
             add_url_to_history(article['link'])
             print(f"Successfully published: {article['title']}")
             processed_count += 1
-            # 7. Stop after one successful post?
-            # The prompt says "Auto-schedule every 4-6 hours". 
-            # Posting one per run is a safe strategy to maintain quality and not flood.
+            # Stop after one successful post to spread out content
             break 
         else:
-            print("Failed to publish.")
+            print("Failed to publish. Check BOT_TOKEN and CHANNEL_ID.")
             
     if processed_count == 0:
         print("No new qualified articles found/published this run.")
