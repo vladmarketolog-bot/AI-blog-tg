@@ -3,7 +3,7 @@ import json
 import re
 from .config import WRITER_PROMPT, CRITIC_PROMPT, GEMINI_API_KEY
 
-MODEL_NAMES = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"]
+MODEL_NAMES = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash", "gemini-flash-latest"]
 
 def call_gemini_api(model_name, prompt):
     """
