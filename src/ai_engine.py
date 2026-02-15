@@ -5,7 +5,7 @@ from .config import WRITER_PROMPT, CRITIC_PROMPT, GEMINI_API_KEY
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 
-MODEL_NAME = "gemini-1.5-pro"
+MODEL_NAME = "gemini-1.5-flash"
 
 def generate_post(article_text):
     """
