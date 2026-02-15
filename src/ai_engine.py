@@ -3,7 +3,7 @@ import json
 import re
 from .config import WRITER_PROMPT, CRITIC_PROMPT, GEMINI_API_KEY
 
-MODEL_NAMES = ["gemini-2.5-pro", "gemini-2.0-flash", "gemini-3-flash-preview", "gemini-2.5-flash"]
+MODEL_NAMES = ["gemini-2.0-flash-lite-001", "gemini-2.0-flash-lite", "gemini-flash-lite-latest", "gemini-2.5-flash", "gemini-2.0-flash"]
 
 import time
 
