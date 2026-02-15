@@ -37,7 +37,7 @@ def main():
         
         # 3. Generate Draft
         # Combine title and summary for better context
-        content = f"Title: {article['title']}\nSource: {article['source']}\nSummary: {article['summary']}"
+        content = f"Title: {article['title']}\nLink: {article['link']}\nSource: {article['source']}\nSummary: {article['summary']}"
         
         # Add delay to respect rate limits (approx 4 seconds between calls to stay under 15 RPM)
         time.sleep(5) 
@@ -61,12 +61,20 @@ def main():
             
         # 5. Generate Image
         tools = "No-code / AI" 
+        revenue = ""
         import re
-        stack_match = re.search(r'\*\*Стек\*\*:\s*(.*)', draft_post)
+        
+        # Extract stack
+        stack_match = re.search(r'\*\*Стек\*\*:\s*(.*)', draft_post) or re.search(r'\*\*Решение.*?\*\*:\s*(.*)', draft_post)
         if stack_match:
             tools = stack_match.group(1).strip()[:30] + "..." if len(stack_match.group(1)) > 30 else stack_match.group(1).strip()
+        
+        # Extract revenue/metrics for image overlay
+        revenue_match = re.search(r'\$\s*(\d[\d,k]+)\s*(MRR|/мес|в месяц)', draft_post, re.IGNORECASE)
+        if revenue_match:
+            revenue = f"${revenue_match.group(1)} MRR"
 
-        image_path = create_cover(article['title'], tools)
+        image_path = create_cover(article['title'], tools, revenue)
         
         # 6. Publish
         if send_post(draft_post, image_path):

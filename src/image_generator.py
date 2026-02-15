@@ -5,9 +5,9 @@ import os
 TEMPLATE_PATH = "template.png"
 COVER_OUTPUT = "cover.jpg"
 
-def create_cover(title, tools):
+def create_cover(title, tools, revenue=""):
     """
-    Generates a cover image based on the template.
+    Generates a cover image based on the template with metrics overlay.
     """
     if not os.path.exists(TEMPLATE_PATH):
         print(f"Template not found at {TEMPLATE_PATH}. Skipping image generation.")
@@ -18,25 +18,23 @@ def create_cover(title, tools):
         draw = ImageDraw.Draw(img)
         width, height = img.size
 
-        # Configuration for text (approximate, adjust based on your template)
-        # Assuming we need to center the title and put tools at the bottom
-        
         # Load font - try to load a system font or default
         try:
              # Try standard fonts
             title_font = ImageFont.truetype("arial.ttf", 60)
             tools_font = ImageFont.truetype("arial.ttf", 40)
+            metric_font = ImageFont.truetype("arialbd.ttf", 50)  # Bold for metrics
+            metric_label_font = ImageFont.truetype("arial.ttf", 30)
         except IOError:
-            # Fallback to default load_default() which is very small, so we might need better fallback
-            # But usually arial.ttf is available on Windows/Linux containers
             title_font = ImageFont.load_default()
             tools_font = ImageFont.load_default()
+            metric_font = ImageFont.load_default()
+            metric_label_font = ImageFont.load_default()
 
         # Draw Title (Centered)
-        # Wrap text
-        lines = textwrap.wrap(title, width=20) # Adjust width based on font size and image width
+        lines = textwrap.wrap(title, width=20)
         
-        y_text = height / 2 - (len(lines) * 35) # Approximate logical centering
+        y_text = height / 2 - (len(lines) * 35)
         for line in lines:
             bbox = draw.textbbox((0, 0), line, font=title_font)
             text_width = bbox[2] - bbox[0]
@@ -49,11 +47,26 @@ def create_cover(title, tools):
         bbox = draw.textbbox((0, 0), tools_text, font=tools_font)
         text_width = bbox[2] - bbox[0]
         x_tools = (width - text_width) / 2
-        y_tools = height - 100 # 100px from bottom
+        y_tools = height - 100
         
         draw.text((x_tools, y_tools), tools_text, font=tools_font, fill="white")
 
-        img = img.convert("RGB") # Ensure RGB for JPEG
+        # Draw Metrics Card (Top-Right Corner) if revenue exists
+        if revenue:
+            card_width = 280
+            card_height = 100
+            card_x = width - card_width - 30
+            card_y = 30
+            
+            # Semi-transparent background
+            overlay = Image.new('RGBA', (card_width, card_height), (0, 0, 0, 180))
+            img.paste(overlay, (card_x, card_y), overlay)
+            
+            # Draw revenue text
+            draw.text((card_x + 20, card_y + 20), "💰", font=metric_font, fill="white")
+            draw.text((card_x + 90, card_y + 30), revenue, font=metric_label_font, fill="#00ff88")
+
+        img = img.convert("RGB")
         img.save(COVER_OUTPUT)
         print(f"Cover image saved to {COVER_OUTPUT}")
         return COVER_OUTPUT
