@@ -10,7 +10,11 @@ TELEGRAM_CHANNEL_ID = os.getenv("TELEGRAM_CHANNEL_ID")
 RSS_FEEDS = [
     "https://www.reddit.com/r/nocode/.rss",
     "https://www.reddit.com/r/saas/.rss",
-    "https://www.indiehackers.com/feed"
+    "https://www.indiehackers.com/feed",
+    "https://www.reddit.com/r/Entrepreneur/.rss",
+    "https://www.reddit.com/r/SideProject/.rss",
+    "https://www.producthunt.com/feed",
+    "https://dev.to/feed/tag/nocode"
 ]
 
 # Prompt for the Writer
