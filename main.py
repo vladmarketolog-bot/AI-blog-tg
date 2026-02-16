@@ -10,6 +10,21 @@ from src.publisher import send_post
 
 def main():
     print("Starting The Builder v1.5...")
+
+    # Check available models first
+    try:
+        import requests
+        from src.config import GEMINI_API_KEY
+        url = f"https://generativelanguage.googleapis.com/v1beta/models?key={GEMINI_API_KEY}"
+        response = requests.get(url)
+        if response.status_code == 200:
+            print("Available Gemini Models:")
+            models = [m['name'].replace('models/', '') for m in response.json().get('models', []) if 'generateContent' in m.get('supportedGenerationMethods', [])]
+            print(f"  {', '.join(models)}")
+        else:
+            print(f"Warning: Could not list models. Status: {response.status_code}")
+    except Exception as e:
+        print(f"Warning: Model check failed: {e}")
     
     # 1. Scrape
     print("Step 1: Scraping RSS feeds...")

@@ -3,9 +3,8 @@ import json
 import re
 from .config import WRITER_PROMPT, CRITIC_PROMPT, GEMINI_API_KEY
 
-# Only use models that are confirmed to work
-# gemini-1.5-flash-8b is the most reliable free tier model
-MODEL_NAMES = ["gemini-1.5-flash-8b", "gemini-1.5-flash-latest"]
+# Standard stable models
+MODEL_NAMES = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-1.0-pro"]
 
 import time
 
