@@ -88,21 +88,11 @@ def main():
                      add_url_to_history(article['link']) 
                 continue
             
-        # 5. Generate Image
-        tools = "No-code / AI" 
-        revenue = ""
-        
-        # Extract stack
-        stack_match = re.search(r'\*\*Стек\*\*:\s*(.*)', draft_post) or re.search(r'\*\*Решение.*?\*\*:\s*(.*)', draft_post)
-        if stack_match:
-            tools = stack_match.group(1).strip()[:30] + "..." if len(stack_match.group(1)) > 30 else stack_match.group(1).strip()
-        
-        # Extract revenue/metrics for image overlay
-        revenue_match = re.search(r'\$\s*(\d[\d,k]+)\s*(MRR|/мес|в месяц)', draft_post, re.IGNORECASE)
-        if revenue_match:
-            revenue = f"${revenue_match.group(1)} MRR"
-
-        image_path = create_cover(article['title'], tools, revenue)
+        # 5. Generate Image - DISABLED per user request (relying on Link Preview)
+        # tools = "No-code / AI" 
+        # revenue = ""
+        # image_path = create_cover(article['title'], tools, revenue)
+        image_path = None
         
         # 6. Publish
         if send_post(draft_post, image_path):

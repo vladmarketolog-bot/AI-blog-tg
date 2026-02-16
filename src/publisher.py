@@ -46,9 +46,15 @@ def send_post(text, image_path):
                     response = requests.post(url_photo, data=data, files=files)
         else:
              # Just text? The prompt implies image is required for score >= 8
-            print("Image path missing for send_post. Sending text only (fallback).")
+            print("Sending text only (Image generation disabled).")
             url_msg = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-            data = {"chat_id": TELEGRAM_CHANNEL_ID, "text": text, "parse_mode": "Markdown"}
+            # Explicitly enable link previews (disable_web_page_preview=False)
+            data = {
+                "chat_id": TELEGRAM_CHANNEL_ID, 
+                "text": text, 
+                "parse_mode": "Markdown",
+                "disable_web_page_preview": False 
+            }
             response = requests.post(url_msg, data=data)
 
         if response.status_code == 200:
