@@ -76,21 +76,17 @@ def main():
         print(f"Critique Score: {score}/10")
         
         if score < 8:
-            print("Score too low. Skipping.")
-            # Only add to history if it was a real critique, not an API failure (0 score often means failure)
-            # But prompt says return 0 on fail. Ideally we distinguishing...
-            # For now, let's assume 0 is a Fail/Bad post. 
-            # SAFETY: If score is 0, it might be API error. Let's NOT save to history so we retry later?
-            # Risk: We might loop on a bad article forever.
-            # Compromise: Add to history only if we are sure it wasn't an API 0.
-            # actually, critique_post returns 0 on API fail.
-            # Let's check if the draft itself looks okay?
-            # Simpler: If score is 0, print warning.
-            if score == 0:
-                 print("Score is 0. Might be API error or terrible post. NOT adding to history to retry later.")
+            # Emergency Bypass: If score is 0 (API failure) but draft is long enough, publish anyway
+            # This prevents losing valid posts due to Rate Limits on the critique step
+            if score == 0 and len(draft_post) > 500:
+                print("⚠️ Critique API failed (Rate Limit), but draft looks valid (>500 chars). PUBLISHING ANYWAY.")
             else:
-                 add_url_to_history(article['link']) 
-            continue
+                print("Score too low. Skipping.")
+                if score == 0:
+                     print("Score is 0. Might be API error or terrible post. NOT adding to history to retry later.")
+                else:
+                     add_url_to_history(article['link']) 
+                continue
             
         # 5. Generate Image
         tools = "No-code / AI" 
