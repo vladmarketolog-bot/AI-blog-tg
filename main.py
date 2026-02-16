@@ -34,23 +34,31 @@ def main():
     # 2. Filter & Process
     processed_count = 0
     
-    # Limit the number of articles to process per run to avoid hitting API limits
-    # Gemini Free Tier has stricter limits than expected.
-    # Processing 1 article per run (every 6 hours) is safer with retries/delays.
-    MAX_ARTICLES_TO_PROCESS = 1
-    articles_checked = 0
+    # Limit the number of articles to CHECK and PUBLISH per run
+    # 'MAX_CHECKED' limits API usage (don't burn all credits on junk)
+    # 'MAX_PUBLISHED' ensures we don't spam the channel
+    MAX_ARTICLES_TO_CHECK = 5 
+    MAX_ARTICLES_TO_PUBLISH = 1
+    
+    articles_checked_count = 0
     
     for article in articles:
-        if articles_checked >= MAX_ARTICLES_TO_PROCESS:
-            print(f"Reached limit of {MAX_ARTICLES_TO_PROCESS} processed articles. Stopping for this run.")
+        # Stop if we've checked enough candidates to save API limits
+        if articles_checked_count >= MAX_ARTICLES_TO_CHECK:
+            print(f"Reached limit of {MAX_ARTICLES_TO_CHECK} checked articles. Stopping for this run.")
+            break
+            
+        # Stop if we've already published enough
+        if processed_count >= MAX_ARTICLES_TO_PUBLISH:
+            print(f"Reached limit of {MAX_ARTICLES_TO_PUBLISH} published articles. Stopping.")
             break
             
         if is_url_processed(article['link']):
             # Skipping doesn't count towards API usage
             continue
             
-        print(f"Processing: {article['title']}")
-        articles_checked += 1
+        print(f"Processing candidate {articles_checked_count + 1}/{MAX_ARTICLES_TO_CHECK}: {article['title']}")
+        articles_checked_count += 1
         
         # 3. Generate Draft
         # Combine title and summary for better context
