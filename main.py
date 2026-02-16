@@ -57,10 +57,9 @@ def main():
         content = f"Title: {article['title']}\nLink: {article['link']}\nSource: {article['source']}\nSummary: {article['summary']}"
         
         # Add delay to respect rate limits
-        # Free tier is ~15 RPM / 1 million TPM. 
-        # We need a solid delay to refill the bucket.
-        print("Waiting 15s to cool down API...")
-        time.sleep(15) 
+        # Increased to 30s to be extra safe with Free Tier
+        print("Waiting 30s to cool down API...")
+        time.sleep(30) 
         print("Calling AI to generate post...")
         draft_post = generate_post(content)
         
@@ -71,14 +70,26 @@ def main():
         print("Draft generated.")
         
         # 4. Critique
-        print("Waiting 15s before critique...")
-        time.sleep(15) # Delay before critique
+        print("Waiting 30s before critique...")
+        time.sleep(30) # Delay before critique
         score = critique_post(draft_post)
         print(f"Critique Score: {score}/10")
         
         if score < 8:
             print("Score too low. Skipping.")
-            add_url_to_history(article['link']) 
+            # Only add to history if it was a real critique, not an API failure (0 score often means failure)
+            # But prompt says return 0 on fail. Ideally we distinguishing...
+            # For now, let's assume 0 is a Fail/Bad post. 
+            # SAFETY: If score is 0, it might be API error. Let's NOT save to history so we retry later?
+            # Risk: We might loop on a bad article forever.
+            # Compromise: Add to history only if we are sure it wasn't an API 0.
+            # actually, critique_post returns 0 on API fail.
+            # Let's check if the draft itself looks okay?
+            # Simpler: If score is 0, print warning.
+            if score == 0:
+                 print("Score is 0. Might be API error or terrible post. NOT adding to history to retry later.")
+            else:
+                 add_url_to_history(article['link']) 
             continue
             
         # 5. Generate Image

@@ -21,7 +21,7 @@ def call_gemini_api(model_name, prompt):
         }]
     }
     
-    max_retries = 2  # Reduced from 3 to fail faster
+    max_retries = 3  # Increase to 3 for reliability
     
     for attempt in range(max_retries):
         try:
@@ -30,8 +30,9 @@ def call_gemini_api(model_name, prompt):
             # Handle Rate Limiting (429)
             if response.status_code == 429:
                 if attempt < max_retries - 1:
-                    print(f"Rate limit hit for {model_name}. Waiting 20s before retry...")
-                    time.sleep(20)
+                    wait_time = 30 * (attempt + 1) # 30s, 60s
+                    print(f"Rate limit hit for {model_name}. Waiting {wait_time}s before retry...")
+                    time.sleep(wait_time)
                     continue
                 else:
                     print(f"Rate limit hit for {model_name}. Trying next model...")
