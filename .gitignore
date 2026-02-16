@@ -1,0 +1,15 @@
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Local artifacts
+cover.jpg
+*.jpg
+!template.png
+
+# IDEs
+.vscode/
+.idea/

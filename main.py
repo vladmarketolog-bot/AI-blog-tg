@@ -1,3 +1,5 @@
+import time
+import re
 from src.config import RSS_FEEDS
 from src.scraper import scrape_feeds
 from src.utils import is_url_processed, add_url_to_history
@@ -21,7 +23,7 @@ def main():
     MAX_ARTICLES_TO_PROCESS = 10
     articles_checked = 0
     
-    import time
+    articles_checked = 0
     
     for article in articles:
         if articles_checked >= MAX_ARTICLES_TO_PROCESS:
@@ -62,7 +64,6 @@ def main():
         # 5. Generate Image
         tools = "No-code / AI" 
         revenue = ""
-        import re
         
         # Extract stack
         stack_match = re.search(r'\*\*Стек\*\*:\s*(.*)', draft_post) or re.search(r'\*\*Решение.*?\*\*:\s*(.*)', draft_post)

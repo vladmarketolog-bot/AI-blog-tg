@@ -4,7 +4,7 @@ A fully autonomous Telegram bot that finds Western No-code/SaaS case studies, an
 
 ## Features
 - **Smart Scraper**: Monitors Reddit (r/nocode, r/saas) and Indie Hackers.
-- **AI Writer & Critic**: Gemini 1.5 Pro writes posts and self-critiques them (publishing only if score >= 8/10).
+- **AI Writer & Critic**: Gemini 2.0 Flash Lite / 1.5 Flash writes posts and self-critiques them (publishing only if score >= 8/10).
 - **Auto-Design**: Generates unique cover images using `Pillow` and a template.
 - **Git-based DB**: Uses `history.json` to track published posts, no external database required.
 - **CI/CD**: Runs automatically via GitHub Actions every 6 hours.
