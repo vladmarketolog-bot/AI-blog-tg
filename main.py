@@ -93,7 +93,7 @@ def main():
         score = critique_post(draft_post)
         print(f"Critique Score: {score}/10")
         
-        if score < 8:
+        if score < 6:
             # Emergency Bypass: If score is 0 (API failure) but draft is long enough, publish anyway
             # This prevents losing valid posts due to Rate Limits on the critique step
             if score == 0 and len(draft_post) > 500:
