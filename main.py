@@ -1,19 +1,20 @@
 import time
 import re
+import os
 from src.config import RSS_FEEDS
 from src.scraper import scrape_feeds
 from src.utils import is_url_processed, add_url_to_history
 from src.ai_engine import generate_post, critique_post
 from src.image_generator import create_cover
 from src.publisher import send_post
-import os
-import time
 
 def main():
     print("Starting The Builder v1.5...")
     
     # 1. Scrape
+    print("Step 1: Scraping RSS feeds...")
     articles = scrape_feeds(RSS_FEEDS)
+    print(f"Step 1 Complete: Found {len(articles)} total articles")
     
     # 2. Filter & Process
     processed_count = 0
@@ -42,6 +43,7 @@ def main():
         
         # Add delay to respect rate limits (approx 4 seconds between calls to stay under 15 RPM)
         time.sleep(5) 
+        print("Calling AI to generate post...")
         draft_post = generate_post(content)
         
         if not draft_post:
