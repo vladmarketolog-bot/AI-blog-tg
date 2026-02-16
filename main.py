@@ -56,8 +56,11 @@ def main():
         # Combine title and summary for better context
         content = f"Title: {article['title']}\nLink: {article['link']}\nSource: {article['source']}\nSummary: {article['summary']}"
         
-        # Add delay to respect rate limits (approx 4 seconds between calls to stay under 15 RPM)
-        time.sleep(5) 
+        # Add delay to respect rate limits
+        # Free tier is ~15 RPM / 1 million TPM. 
+        # We need a solid delay to refill the bucket.
+        print("Waiting 15s to cool down API...")
+        time.sleep(15) 
         print("Calling AI to generate post...")
         draft_post = generate_post(content)
         
@@ -68,7 +71,8 @@ def main():
         print("Draft generated.")
         
         # 4. Critique
-        time.sleep(5) # Delay before critique
+        print("Waiting 15s before critique...")
+        time.sleep(15) # Delay before critique
         score = critique_post(draft_post)
         print(f"Critique Score: {score}/10")
         

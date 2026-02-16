@@ -4,7 +4,8 @@ import re
 from .config import WRITER_PROMPT, CRITIC_PROMPT, GEMINI_API_KEY
 
 # Verified models from API check
-MODEL_NAMES = ["gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-flash-latest"]
+# gemini-flash-latest showed success in logs, prioritizing it
+MODEL_NAMES = ["gemini-flash-latest", "gemini-2.0-flash-lite", "gemini-2.0-flash"]
 
 import time
 
@@ -26,10 +27,15 @@ def call_gemini_api(model_name, prompt):
         try:
             response = requests.post(url, headers=headers, json=data, timeout=30)
             
-            # Handle Rate Limiting (429) - fail immediately, try next model
+            # Handle Rate Limiting (429)
             if response.status_code == 429:
-                print(f"Rate limit hit for {model_name}. Trying next model...")
-                return None  # Don't retry, just move to next model
+                if attempt < max_retries - 1:
+                    print(f"Rate limit hit for {model_name}. Waiting 20s before retry...")
+                    time.sleep(20)
+                    continue
+                else:
+                    print(f"Rate limit hit for {model_name}. Trying next model...")
+                    return None
                 
             response.raise_for_status()
             result = response.json()
