@@ -75,6 +75,16 @@ def main():
             print("Failed to generate draft. Skipping.")
             continue
             
+        if draft_post.strip() == "SKIP":
+            print("🚫 AI decided to skip this article (Not a specific project/SaaS).")
+            # We treat it as processed so we don't try it again and waste API credits? 
+            # Actually, let's NOT add to history, maybe we improve prompt later. 
+            # But to avoid loop in this run, we just continue. 
+            # Update: If we don't add to history, it might appear in next run. 
+            # Let's add to history essentially saying "we saw it and it's junk".
+            add_url_to_history(article['link'])
+            continue
+
         print("Draft generated.")
         
         # 4. Critique
