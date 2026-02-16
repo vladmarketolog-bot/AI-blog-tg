@@ -19,6 +19,19 @@ def scrape_feeds(feed_urls):
                     if not summary and hasattr(entry, 'content'):
                         summary = entry.content[0].value if entry.content else ''
                     
+                    # Smart Filter: Check for "junk" keywords in title
+                    title_lower = entry.title.lower()
+                    junk_keywords = ['help', 'question', 'advice needed', 'looking for', 'request', 'feedback on idea']
+                    
+                    if any(keyword in title_lower for keyword in junk_keywords):
+                        print(f"Skipping (Junk keyword): {entry.title}")
+                        continue
+                        
+                    # Filter out very short content (likely just a link or empty post)
+                    if len(summary) < 50:
+                        print(f"Skipping (Too short): {entry.title}")
+                        continue
+
                     articles.append({
                         'title': entry.title,
                         'link': entry.link,
