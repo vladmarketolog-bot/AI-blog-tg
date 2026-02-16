@@ -61,7 +61,18 @@ def send_post(text, image_path):
             print("Post published successfully.")
             return True
         else:
-            print(f"Failed to publish post: {response.text}")
+            print(f"Failed to publish post (Markdown error?): {response.text}")
+            # FALLBACK: Try sending without Markdown
+            if "can't parse entities" in response.text or "Bad Request" in response.text:
+                print("⚠️ Markdown parsing failed. Retrying as plain text...")
+                data.pop("parse_mode", None) # Remove parse_mode completely
+                response_fallback = requests.post(url_msg, data=data)
+                if response_fallback.status_code == 200:
+                     print("Post published successfully (Plain Text Fallback).")
+                     return True
+                else:
+                    print(f"Failed to publish even as plain text: {response_fallback.text}")
+                    return False
             return False
 
     except Exception as e:
