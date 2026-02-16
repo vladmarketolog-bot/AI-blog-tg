@@ -3,8 +3,8 @@ import json
 import re
 from .config import WRITER_PROMPT, CRITIC_PROMPT, GEMINI_API_KEY
 
-# Standard stable models
-MODEL_NAMES = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-1.0-pro"]
+# Verified models from API check
+MODEL_NAMES = ["gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-flash-latest"]
 
 import time
 
