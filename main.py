@@ -36,8 +36,8 @@ def main():
     
     # Limit the number of articles to process per run to avoid hitting API limits
     # Gemini Free Tier has stricter limits than expected.
-    # Processing 5 articles = 10 calls (Generation + Critique). Optimal for quality.
-    MAX_ARTICLES_TO_PROCESS = 5
+    # Processing 1 article per run (every 6 hours) is safer with retries/delays.
+    MAX_ARTICLES_TO_PROCESS = 1
     articles_checked = 0
     
     for article in articles:
