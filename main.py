@@ -7,6 +7,7 @@ from src.ai_engine import generate_post, critique_post
 from src.image_generator import create_cover
 from src.publisher import send_post
 import os
+import time
 
 def main():
     print("Starting The Builder v1.5...")
@@ -19,10 +20,8 @@ def main():
     
     # Limit the number of articles to process per run to avoid hitting API limits
     # Gemini Free Tier has stricter limits than expected.
-    # Processing 10 articles = 20 calls (Generation + Critique). Optimal for quality.
-    MAX_ARTICLES_TO_PROCESS = 10
-    articles_checked = 0
-    
+    # Processing 5 articles = 10 calls (Generation + Critique). Optimal for quality.
+    MAX_ARTICLES_TO_PROCESS = 5
     articles_checked = 0
     
     for article in articles:
