@@ -1,11 +1,12 @@
 import requests
 import json
 import re
+import random
 from .config import WRITER_PROMPT, CRITIC_PROMPT, GEMINI_API_KEY
 
 # Verified models from API check
-# gemini-flash-latest showed success in logs, prioritizing it
-MODEL_NAMES = ["gemini-flash-latest", "gemini-2.0-flash-lite", "gemini-2.0-flash"]
+# Switching to 'Lite' models to bypass rate limits on standard/pro models
+MODEL_NAMES = ["gemini-2.5-flash-lite", "gemini-flash-lite-latest", "gemini-2.0-flash-lite"]
 
 import time
 
@@ -72,7 +73,11 @@ def generate_post(article_text):
     """
     Generates a draft post using Gemini, trying multiple models via REST API.
     """
-    for model_name in MODEL_NAMES:
+    # Roulette: Shuffle models to distribute load and avoid hitting limits on the first one
+    models_to_try = MODEL_NAMES.copy()
+    random.shuffle(models_to_try)
+    
+    for model_name in models_to_try:
         full_prompt = f"{WRITER_PROMPT}\n\nТекст статьи:\n{article_text}"
         result = call_gemini_api(model_name, full_prompt)
         if result:
@@ -86,7 +91,11 @@ def critique_post(draft_post):
     """
     Critiques the draft post and returns a score (0-10).
     """
-    for model_name in MODEL_NAMES:
+    # Roulette here too
+    models_to_try = MODEL_NAMES.copy()
+    random.shuffle(models_to_try)
+    
+    for model_name in models_to_try:
         full_prompt = f"{CRITIC_PROMPT}\n\nЧерновик поста:\n{draft_post}"
         result = call_gemini_api(model_name, full_prompt)
         if result:
