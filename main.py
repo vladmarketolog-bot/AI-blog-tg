@@ -75,7 +75,8 @@ def main():
             print("Failed to generate draft. Skipping.")
             continue
             
-        if draft_post.strip() == "SKIP":
+        # Robust SKIP check: catches "SKIP", "SKIP.", "SKIP!", "skip", "SKIP\nпояснение..." etc.
+        if draft_post.strip().upper().startswith("SKIP"):
             print("🚫 AI decided to skip this article (Not a specific project/SaaS).")
             # We treat it as processed so we don't try it again and waste API credits? 
             # Actually, let's NOT add to history, maybe we improve prompt later. 
@@ -96,7 +97,9 @@ def main():
         if score < 6:
             # Emergency Bypass: If score is 0 (API failure) but draft is long enough, publish anyway
             # This prevents losing valid posts due to Rate Limits on the critique step
-            if score == 0 and len(draft_post) > 500:
+            # Guard: Never bypass for SKIP posts (even long ones with explanations)
+            is_skip_post = draft_post.strip().upper().startswith("SKIP")
+            if score == 0 and len(draft_post) > 500 and not is_skip_post:
                 print("⚠️ Critique API failed (Rate Limit), but draft looks valid (>500 chars). PUBLISHING ANYWAY.")
             else:
                 print("Score too low. Skipping.")
