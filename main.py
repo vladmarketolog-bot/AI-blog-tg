@@ -3,7 +3,7 @@ import re
 import os
 from src.config import RSS_FEEDS
 from src.scraper import scrape_feeds
-from src.utils import is_url_processed, add_url_to_history
+from src.utils import is_url_processed, add_url_to_history, add_to_digest
 from src.ai_engine import generate_post, critique_post
 from src.image_generator import create_cover
 from src.publisher import send_post
@@ -118,6 +118,7 @@ def main():
         # 6. Publish
         if send_post(draft_post, image_path):
             add_url_to_history(article['link'])
+            add_to_digest(article['title'], article['link'])
             print(f"Successfully published: {article['title']}")
             processed_count += 1
             # Stop after one successful post to spread out content
